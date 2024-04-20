@@ -1,3 +1,4 @@
+const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 
 exports.createOne = Model =>
@@ -14,23 +15,15 @@ exports.createOne = Model =>
 
 exports.findAll = Model =>
   catchAsync(async (req, res, next) => {
-    // destructuring the query to a new variable for not losing data
-    const queryObj = { ...req.query };
-    // excluded feilds that we will implement later
-    const excludeFeilds = ['sort', 'feilds', 'limit', 'page'];
-    excludeFeilds.forEach(el => delete queryObj[el]);
+    const features = new APIFeatures(Model.find(), req.query).filter();
 
-    // converting the queryObj to string so we can apply replace function to add $ with (gt|gte|lt|lte)
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`);
-
-    const docs = await Model.find(JSON.parse(queryStr));
+    const doc = await features.query;
 
     res.status(200).json({
       status: 'success',
-      result: docs.length,
+      result: doc.length,
       data: {
-        data: docs
+        data: doc
       }
     });
   });

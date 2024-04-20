@@ -59,3 +59,19 @@ exports.updateOne = Model =>
       }
     });
   });
+
+exports.deleteOne = Model =>
+  catchAsync(async (req, res, next) => {
+    await Model.findByIdAndDelete(req.params.id);
+
+    // if (!doc) {
+    //   return next('No doc found with this id');
+    // }
+
+    res.status(204).json({
+      status: 'success',
+      data: {
+        data: null
+      }
+    });
+  });

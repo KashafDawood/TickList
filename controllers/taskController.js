@@ -1,12 +1,4 @@
 const Task = require('./../models/taskModel');
+const factoryHandler = require('./factoryHandler');
 
-exports.createTask = async (req, res) => {
-  const task = await Task.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      task
-    }
-  });
-};
+exports.createTask = factoryHandler.createOne(Task);

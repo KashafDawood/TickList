@@ -1,4 +1,6 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const mongoose = require('mongoose');
+const { default: slugify } = require('slugify');
 
 const taskSchema = new mongoose.Schema({
   title: {
@@ -9,6 +11,7 @@ const taskSchema = new mongoose.Schema({
   description: {
     type: String
   },
+  slug: String,
   category: {
     type: String,
     enum: ['General', 'Personal', 'Work', 'Study'],
@@ -26,12 +29,23 @@ const taskSchema = new mongoose.Schema({
   },
   deadline: {
     type: Date,
-    default: null
+    default: null,
+    validate: {
+      validator: function(value) {
+        return value === null || value >= Date.now();
+      },
+      message: 'Deadline must be in the future or null'
+    }
   },
   createdAt: {
     type: Date,
     default: Date.now
   }
+});
+
+taskSchema.pre('save', function(next) {
+  this.slug = slugify(this.title, { lower: true });
+  next();
 });
 
 const Task = mongoose.model('Task', taskSchema);

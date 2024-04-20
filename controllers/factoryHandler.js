@@ -14,7 +14,14 @@ exports.createOne = Model =>
 
 exports.findAll = Model =>
   catchAsync(async (req, res, next) => {
-    const docs = await Model.find();
+    // destructuring the query to a new variable for not losing data
+    const queryObj = { ...req.query };
+    // excluded feilds that we will implement later
+    const excludeFeilds = ['sort', 'feilds', 'limit', 'page'];
+    excludeFeilds.forEach(el => delete queryObj[el]);
+    console.log(req.query, queryObj);
+
+    const docs = await Model.find(queryObj);
 
     res.status(200).json({
       status: 'success',

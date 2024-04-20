@@ -43,8 +43,18 @@ const taskSchema = new mongoose.Schema({
   }
 });
 
+// Pre-save hook to generate slug
 taskSchema.pre('save', function(next) {
   this.slug = slugify(this.title, { lower: true });
+  next();
+});
+
+// Pre-update hook to update slug if title changes
+taskSchema.pre('findOneAndUpdate', function(next) {
+  const update = this.getUpdate();
+  if (update.title) {
+    update.slug = slugify(update.title, { lower: true });
+  }
   next();
 });
 

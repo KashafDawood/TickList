@@ -4,3 +4,4 @@ const factoryHandler = require('./factoryHandler');
 exports.createTask = factoryHandler.createOne(Task);
 exports.getAllTasks = factoryHandler.findAll(Task);
 exports.getTask = factoryHandler.findOne(Task);
+exports.updateTask = factoryHandler.updateOne(Task);

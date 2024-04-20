@@ -30,6 +30,17 @@ class apiFeatures {
 
     return this;
   }
+
+  limitFeilds() {
+    if (this.queryString.feilds) {
+      const feilds = this.queryString.feilds.split(',').join(' ');
+      this.query = this.query.select(feilds);
+    } else {
+      this.query.select('-__v');
+    }
+
+    return this;
+  }
 }
 
 module.exports = apiFeatures;

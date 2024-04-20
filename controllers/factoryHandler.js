@@ -15,7 +15,7 @@ exports.createOne = Model =>
 
 exports.findAll = Model =>
   catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Model.find(), req.query).filter();
+    const features = new APIFeatures(Model.find(), req.query).filter().sort();
 
     const doc = await features.query;
 

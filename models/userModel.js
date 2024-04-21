@@ -33,6 +33,19 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+// Password encryption middleware
+userSchema.pre('save', async function(next) {
+  // if password is not modified
+  if (!this.isModified('password')) return next();
+
+  // encryption
+  this.password = await bcrypt.hash(this.password, 12);
+  // delete the confirm password after confirmation
+  this.passwordConfirm = undefined;
+
+  next();
+});
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

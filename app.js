@@ -4,6 +4,7 @@ const morgan = require('morgan');
 
 const taskRouter = require('./routes/taskroute');
 const globalErrorHandler = require('./controllers/errorController');
+const AppError = require('./utils/appError');
 
 const app = express();
 
@@ -24,12 +25,7 @@ app.use((req, res, next) => {
 app.use('/api/v1/tasks', taskRouter);
 
 app.all('*', (req, res, next) => {
-  const err = new Error(`Can't find ${req.originalUrl} on this server!`);
-
-  err.status = 'fail';
-  err.statusCode = 404;
-
-  next(err);
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
 app.use(globalErrorHandler);

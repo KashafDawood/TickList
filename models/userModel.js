@@ -40,7 +40,12 @@ const userSchema = new mongoose.Schema({
       message: 'Password are not the same!'
     }
   },
-  slug: String
+  slug: String,
+  role: {
+    type: String,
+    enum: ['Project Manager', 'Admin', 'User'],
+    default: 'user'
+  }
 });
 
 // Password encryption middleware

@@ -1,13 +1,37 @@
+/* eslint-disable import/no-extraneous-dependencies */
+const jwt = require('jsonwebtoken');
+
 const catchAsync = require('./../utils/catchAsync');
 const User = require('./../models/userModel');
 
-exports.signUp = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
+const signToken = id => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN
+  });
+};
 
-  res.status(200).json({
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  // removing password from output
+  user.password = undefined;
+
+  res.status(statusCode).json({
     status: 'success',
+    token,
     data: {
-      newUser
+      user
     }
   });
+};
+
+exports.signUp = catchAsync(async (req, res, next) => {
+  const newUser = await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm
+  });
+
+  createSendToken(newUser, 201, res);
 });

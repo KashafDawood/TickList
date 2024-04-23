@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 
 const catchAsync = require('./../utils/catchAsync');
 const User = require('./../models/userModel');
@@ -56,4 +57,43 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // if everything ok then send the token
   createSendToken(user, 200, res);
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // getting the token and check if it is there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(
+      new AppError('You are not logged in, Please login to get access!')
+    );
+  }
+
+  // verify token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // check for user still exist
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError('The user belong to that token is no longer exist', 401)
+    );
+  }
+
+  // check if the user change password after token issued
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please log in again.', 401)
+    );
+  }
+
+  // if everything ok then return the user
+  req.user = currentUser;
+  next();
 });

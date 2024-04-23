@@ -50,17 +50,9 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  passwordChangedAt: String
 });
-
-// INSTANCE METHODS
-// correct password checker
-userSchema.methods.correctPassword = async function(
-  canidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(canidatePassword, userPassword);
-};
 
 // Password encryption middleware
 userSchema.pre('save', async function(next) {
@@ -89,6 +81,30 @@ userSchema.pre('findOneAndUpdate', function(next) {
   }
   next();
 });
+
+// ==================================================================================
+
+// INSTANCE METHODS
+// correct password checker
+userSchema.methods.correctPassword = async function(
+  canidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(canidatePassword, userPassword);
+};
+
+// check for change password after token issue
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
+  // passwordChangedAt timestamp
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
+};
 
 const User = mongoose.model('User', userSchema);
 

@@ -28,7 +28,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Please provide a password!'],
-    minlength: 8
+    minlength: 8,
+    select: false
   },
   passwordConfirm: {
     type: String,
@@ -51,6 +52,15 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+// INSTANCE METHODS
+// correct password checker
+userSchema.methods.correctPassword = async function(
+  canidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(canidatePassword, userPassword);
+};
 
 // Password encryption middleware
 userSchema.pre('save', async function(next) {

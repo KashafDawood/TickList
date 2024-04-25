@@ -53,8 +53,8 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
   passwordChangedAt: String,
-  passwordResetToken: String,
-  passwordResetExpire: Date
+  passwordResetExpire: Date,
+  passwordResetToken: String
 });
 
 // Password encryption middleware
@@ -82,6 +82,15 @@ userSchema.pre('findOneAndUpdate', function(next) {
   if (update.name) {
     update.slug = slugify(update.name, { lower: true });
   }
+  next();
+});
+
+// pre-update hook for passwordchangedat
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // subtracting 1 sec as sometime it get delay
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
@@ -113,14 +122,13 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
 userSchema.methods.createPasswordResetToken = function() {
   const resetToken = crypto.randomBytes(32).toString('hex');
 
-  // hash the resettoken to save on db
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
 
-  // 10 min after it is created.
-  this.passwordResetExpire = Date.now() * 10 * 60 * 1000;
+  this.passwordResetExpire = Date.now() + 10 * 60 * 1000;
+
   return resetToken;
 };
 

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const slugify = require('slugify');
+const crypto = require('crypto');
 
 const helperfunctions = require('./../utils/helperfunctions');
 
@@ -51,7 +52,9 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  passwordChangedAt: String
+  passwordChangedAt: String,
+  passwordResetToken: String,
+  passwordResetExpire: Date
 });
 
 // Password encryption middleware
@@ -104,6 +107,21 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
     return JWTTimestamp < changedTimestamp;
   }
   return false;
+};
+
+// password resetToken
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // hash the resettoken to save on db
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // 10 min after it is created.
+  this.passwordResetExpire = Date.now() * 10 * 60 * 1000;
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);

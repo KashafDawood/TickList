@@ -107,16 +107,16 @@ userSchema.methods.correctPassword = async function(
 
 // check for change password after token issue
 userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
-  if (this.passwordChangedAt) {
+  if (this.passwordChangeAt) {
+    //change the passwordchangeat timestamp
     const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
+      this.passwordChangeAt.getTime() / 1000,
       10
     );
 
     return JWTTimestamp < changedTimestamp;
   }
 
-  // False means NOT changed
   return false;
 };
 

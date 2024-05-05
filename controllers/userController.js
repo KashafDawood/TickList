@@ -24,15 +24,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     );
   }
 
-  // // Check if the new email already exists in the database
-  // const { email } = req.body;
-  // const existingUser = await User.findOne({ email });
-  // if (existingUser) {
-  //   return next(
-  //     new AppError('Email already exists. Please use a different email.', 400)
-  //   );
-  // }
-
   // Update user document
   const filteredBody = filterObj(req.body, 'name', 'email');
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {

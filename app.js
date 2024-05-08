@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
-const hpp = require('hpp');
+// const hpp = require('hpp');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -32,6 +32,12 @@ if (process.env.NODE_ENV === 'development') {
 
 // body parser
 app.use(express.json());
+
+// data sanitize for no sql injections
+app.use(mongoSanitize());
+
+// data sanitization against xss
+app.use(xss());
 
 // Test middleware
 app.use((req, res, next) => {

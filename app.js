@@ -18,6 +18,14 @@ const app = express();
 // set security http methods
 app.use(helmet());
 
+// limit request form same ip
+const limit = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from the same ip! Try again after an hour'
+});
+app.use('/api', limit);
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }

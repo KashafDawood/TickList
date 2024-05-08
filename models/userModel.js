@@ -53,6 +53,11 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  },
   passwordChangedAt: String,
   passwordResetExpire: Date,
   passwordResetToken: String
@@ -71,13 +76,15 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-// Pre-save hook to generate slug
+///////////////// MONGOOSE MIDDLEWARE ///////////////////////
+
+// generate slug
 userSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
 
-// Pre-update hook to update slug if title changes
+// update slug if title changes
 userSchema.pre('findOneAndUpdate', function(next) {
   const update = this.getUpdate();
   if (update.name) {
@@ -86,12 +93,18 @@ userSchema.pre('findOneAndUpdate', function(next) {
   next();
 });
 
-// pre-update hook for passwordchangedat
+// passwordchangedat
 userSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next();
 
   // subtracting 1 sec as sometime it get delay
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+// filter the active user only
+userSchema.pre(/^find/, function(next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 

@@ -8,9 +8,7 @@ const taskSchema = new mongoose.Schema({
     maxlength: [40, 'A title of a task is less or equal to 40 characters'],
     required: [true, 'A task must have a title']
   },
-  description: {
-    type: String
-  },
+  description: String,
   slug: String,
   category: {
     type: String,

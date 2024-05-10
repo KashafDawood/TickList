@@ -7,4 +7,6 @@ const router = express.Router();
 
 router.route('/').post(authController.protect, projectController.createProject);
 
+router.route('/:id').get(authController.protect, projectController.getProject);
+
 module.exports = router;

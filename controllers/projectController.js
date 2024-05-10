@@ -4,3 +4,4 @@ const factoryHandler = require('./../controllers/factoryHandler');
 const Project = require('./../models/projectModel');
 
 exports.createProject = factoryHandler.createOne(Project);
+exports.getProject = factoryHandler.findOne(Project);

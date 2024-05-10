@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const mongoose = require('mongoose');
-const { default: slugify } = require('slugify');
+
+const helperfunctions = require('./../utils/helperfunctions');
 
 const taskSchema = new mongoose.Schema({
   title: {
@@ -42,19 +43,10 @@ const taskSchema = new mongoose.Schema({
 });
 
 // Pre-save hook to generate slug
-taskSchema.pre('save', function(next) {
-  this.slug = slugify(this.title, { lower: true });
-  next();
-});
+helperfunctions.generateSlug(taskSchema, 'title');
 
 // Pre-update hook to update slug if title changes
-taskSchema.pre('findOneAndUpdate', function(next) {
-  const update = this.getUpdate();
-  if (update.title) {
-    update.slug = slugify(update.title, { lower: true });
-  }
-  next();
-});
+helperfunctions.updateSlug(taskSchema, 'title');
 
 const Task = mongoose.model('Task', taskSchema);
 

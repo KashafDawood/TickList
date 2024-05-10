@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const helperfunctions = require('./../utils/helperfunctions');
+
 const projectSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -11,6 +13,7 @@ const projectSchema = new mongoose.Schema({
     type: Date,
     default: Date.now()
   },
+  slug: String,
   projectManager: {
     type: mongoose.Schema.ObjectId,
     ref: 'User'
@@ -29,6 +32,11 @@ const projectSchema = new mongoose.Schema({
     }
   ]
 });
+
+// create slug
+helperfunctions.generateSlug(projectSchema, 'name');
+//update slug if name change
+helperfunctions.updateSlug(projectSchema, 'name');
 
 const Project = mongoose.model('Project', projectSchema);
 

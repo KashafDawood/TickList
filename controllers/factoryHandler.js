@@ -4,6 +4,10 @@ const catchAsync = require('./../utils/catchAsync');
 
 exports.createOne = Model =>
   catchAsync(async (req, res, next) => {
+    if (Model.modelName === 'Project') {
+      req.body.projectManager = req.user.id;
+    }
+
     const doc = await Model.create(req.body);
 
     res.status(201).json({

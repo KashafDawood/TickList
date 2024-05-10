@@ -13,8 +13,7 @@ const projectSchema = new mongoose.Schema({
   },
   projectManager: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   admin: [
     {

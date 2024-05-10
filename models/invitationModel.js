@@ -24,4 +24,5 @@ const invitationSchema = new mongoose.Schema({
 });
 
 const Invitation = mongoose.model('Invitation', invitationSchema);
-exports.module = Invitation;
+
+module.exports = Invitation;

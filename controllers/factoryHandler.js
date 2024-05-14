@@ -18,9 +18,15 @@ exports.createOne = Model =>
     });
   });
 
-exports.findAll = Model =>
+exports.findAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Model.find(), req.query)
+    const user = req.user.id;
+    let query = Model.find({
+      $or: [{ projectManager: user }, { members: { $in: [user] } }]
+    });
+    if (popOptions) query = query.populate(popOptions);
+    console.log('Query:', query.getQuery());
+    const features = new APIFeatures(query, req.query)
       .filter()
       .sort()
       .limitFeilds();

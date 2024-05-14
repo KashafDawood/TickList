@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
   slug: String,
   role: {
     type: String,
-    enum: ['Project Manager', 'Admin', 'User'],
+    enum: ['admin', 'user'],
     default: 'User'
   },
   createdAt: {

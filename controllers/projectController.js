@@ -5,4 +5,8 @@ const Project = require('./../models/projectModel');
 
 exports.createProject = factoryHandler.createOne(Project);
 exports.getProject = factoryHandler.findOne(Project);
-exports.getAllProject = factoryHandler.findAll(Project);
+exports.getAllProject = factoryHandler.findAll(
+  Project,
+  { path: 'projectManager' },
+  { path: 'members' }
+);

@@ -18,13 +18,6 @@ const projectSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User'
   },
-  admin: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      maxLength: [2, 'A Project can have only 2 Admins']
-    }
-  ],
   members: [
     {
       type: mongoose.Schema.ObjectId,

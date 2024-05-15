@@ -21,6 +21,7 @@ exports.createOne = Model =>
 exports.findAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     const user = req.user.id;
+    // let query = Model.find({ members: user });
     let query = Model.find({
       $or: [{ projectManager: user }, { members: { $in: [user] } }]
     });

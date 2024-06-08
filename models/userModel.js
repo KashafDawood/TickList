@@ -60,7 +60,20 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: String,
   passwordResetExpire: Date,
-  passwordResetToken: String
+  passwordResetToken: String,
+  projects: [
+    {
+      project: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project'
+      },
+      role: {
+        type: String,
+        enum: ['projectManager', 'member'],
+        default: 'member'
+      }
+    }
+  ]
 });
 
 // Password encryption middleware

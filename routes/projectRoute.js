@@ -10,6 +10,10 @@ router
   .post(authController.protect, projectController.createProject)
   .get(authController.protect, projectController.getAllProject);
 
+router
+  .route('/userProjects')
+  .get(authController.protect, projectController.getUserProjects);
+
 router.route('/:id').get(authController.protect, projectController.getProject);
 
 module.exports = router;

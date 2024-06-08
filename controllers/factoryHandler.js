@@ -1,32 +1,52 @@
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
+const User = require('./../models/userModel');
 
 exports.createOne = Model =>
   catchAsync(async (req, res, next) => {
+    const { body } = req;
+
     if (Model.modelName === 'Project') {
-      req.body.projectManager = req.user.id;
+      const userId = req.user.id;
+
+      // Create the project first to get its ID
+      const projectData = {
+        name: req.body.name,
+        description: req.body.description,
+        users: [{ user: userId, role: 'projectManager' }]
+      };
+      const project = await Model.create(projectData);
+
+      // Add the project to the user's projects array
+      await User.findByIdAndUpdate(userId, {
+        $push: {
+          projects: { project: project._id, role: 'projectManager' }
+        }
+      });
+
+      res.status(201).json({
+        status: 'success',
+        data: {
+          data: project
+        }
+      });
+    } else {
+      const doc = await Model.create(body);
+
+      res.status(201).json({
+        status: 'success',
+        data: {
+          data: doc
+        }
+      });
     }
-
-    const doc = await Model.create(req.body);
-
-    res.status(201).json({
-      status: 'success',
-      data: {
-        data: doc
-      }
-    });
   });
 
 exports.findAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
-    const user = req.user.id;
-    // let query = Model.find({ members: user });
-    let query = Model.find({
-      $or: [{ projectManager: user }, { members: { $in: [user] } }]
-    });
+    let query = Model.find();
     if (popOptions) query = query.populate(popOptions);
-    console.log('Query:', query.getQuery());
     const features = new APIFeatures(query, req.query)
       .filter()
       .sort()

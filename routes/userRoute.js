@@ -14,6 +14,10 @@ router
   .route('/updatePassword')
   .post(authController.protect, authController.updatePassword);
 
+router
+  .route('/getUserProjects')
+  .get(authController.protect, userController.getUserProjects);
+
 router.route('/').get(authController.protect, userController.getAllUsers);
 
 module.exports = router;

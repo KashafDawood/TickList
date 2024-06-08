@@ -48,4 +48,17 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getUserProjects = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id).populate({
+    path: 'projects.project',
+    select: '_id name role'
+  });
+
+  res.status(200).json({
+    status: 'success',
+    result: user.projects.length,
+    data: user.projects
+  });
+});
+
 exports.getAllUsers = factoryHandler.findAll(User);

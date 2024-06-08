@@ -14,14 +14,18 @@ const projectSchema = new mongoose.Schema({
     default: Date.now()
   },
   slug: String,
-  projectManager: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User'
-  },
-  members: [
+  users: [
     {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User'
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      role: {
+        type: String,
+        enum: ['projectManager', 'member'],
+        required: true
+      }
     }
   ]
 });

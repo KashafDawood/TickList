@@ -1,6 +1,9 @@
 /* eslint-disable no-console */
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const http = require('http');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const socketio = require('socket.io');
 
 process.on('uncaughtException', err => {
   console.log(err.name, err.message);
@@ -23,7 +26,12 @@ mongoose.connect(DB).then(() => {
 });
 
 const port = process.env.PORT;
-const server = app.listen(port, () => {
+const server = http.createServer(app);
+const io = socketio(server);
+
+app.set('io', io);
+
+server.listen(port, () => {
   console.log(`App is running on ${port}...`);
 });
 
@@ -35,3 +43,18 @@ process.on('unhandledRejection', err => {
     process.exit(1);
   });
 });
+
+io.on('connection', socket => {
+  console.log('New WebSocket Connection');
+
+  socket.on('join', userId => {
+    socket.join(userId);
+    console.log(`User ${userId} joined`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+module.exports = { io };

@@ -13,7 +13,6 @@ const AppError = require('./utils/appError');
 const taskRouter = require('./routes/taskroute');
 const userRouter = require('./routes/userRoute');
 const projectRouter = require('./routes/projectRoute');
-const invitationRouter = require('./routes/invitationRoute');
 const notificaitonRouter = require('./routes/notificationRoute');
 
 const app = express();
@@ -55,7 +54,6 @@ app.use((req, res, next) => {
 app.use('/api/v1/tasks', taskRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/projects', projectRouter);
-app.use('/api/v1/invitations', invitationRouter);
 app.use('/api/v1/notifications', notificaitonRouter);
 
 app.all('*', (req, res, next) => {

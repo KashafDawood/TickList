@@ -34,7 +34,8 @@ const notificationSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  readAt: Date
 });
 
 const Notification = mongoose.model('Notification', notificationSchema);

@@ -13,4 +13,8 @@ router
   .route('/inviteUserToProject')
   .post(authController.protect, notificationController.inviteUserToProject);
 
+router
+  .route('/invitationResponse')
+  .post(authController.protect, notificationController.invitationResponse);
+
 module.exports = router;

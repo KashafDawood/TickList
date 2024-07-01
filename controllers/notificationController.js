@@ -68,3 +68,43 @@ exports.inviteUserToProject = catchAsync(async (req, res, next) => {
     message: 'Invitation sent successfully'
   });
 });
+
+exports.invitationResponse = catchAsync(async (req, res, next) => {
+  const { notificationId, response } = req.body;
+  const userId = req.user.id;
+
+  // Find and update the notification
+  const notification = await Notification.findByIdAndUpdate(
+    notificationId, // Use the notificationId directly
+    { status: response, readAt: Date.now() },
+    { new: true }
+  ).populate('project'); // Populate the 'project' field
+
+  // Check if the notification was found and belongs to the user
+  if (
+    !notification ||
+    notification.receiver.toString() !== userId ||
+    notification.type !== 'projectInvitation'
+  ) {
+    return next(new AppError('No such Invitation found', 404));
+  }
+
+  // If the response is accepted, add the user to the project and update the user's projects list
+  if (response === 'accepted') {
+    await Project.findByIdAndUpdate(notification.project._id, {
+      $push: { users: { user: userId, role: 'member' } }
+    });
+
+    await User.findByIdAndUpdate(userId, {
+      $push: { projects: { project: notification.project._id, role: 'member' } }
+    });
+  }
+
+  // Send the response back to the client
+  res.status(200).json({
+    status: 'success',
+    data: {
+      notification
+    }
+  });
+});

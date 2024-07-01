@@ -7,7 +7,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(authController.protect, notificationController.findAllnotification);
+  .get(authController.protect, notificationController.findAllNotification);
 
 router
   .route('/inviteUserToProject')

@@ -2,8 +2,8 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const http = require('http');
-// eslint-disable-next-line import/no-extraneous-dependencies
-const socketio = require('socket.io');
+
+const socket = require('./socket');
 
 process.on('uncaughtException', err => {
   console.log(err.name, err.message);
@@ -26,13 +26,44 @@ mongoose.connect(DB).then(() => {
 });
 
 const port = process.env.PORT;
+// Create an HTTP server
 const server = http.createServer(app);
-const io = socketio(server);
 
-app.set('io', io);
+// Initialize Socket.IO
+const io = socket.init(server);
 
+io.on('connection', clientSocket => {
+  console.log('New WebSocket Connection');
+
+  clientSocket.on('join', userId => {
+    if (!userId) {
+      console.error('No userId provided');
+      return;
+    }
+    clientSocket.join(userId);
+    console.log(`User ${userId} joined`);
+  });
+
+  clientSocket.on('sendMessage', (userId, message) => {
+    if (!userId) {
+      console.error('No userId provided');
+      return;
+    }
+    if (!message) {
+      console.error('No message provided');
+      return;
+    }
+    io.to(userId).emit('receiveMessage', message);
+  });
+
+  clientSocket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+// Start the server
 server.listen(port, () => {
-  console.log(`App is running on ${port}...`);
+  console.log(`App is running on port ${port}...`);
 });
 
 process.on('unhandledRejection', err => {
@@ -44,17 +75,4 @@ process.on('unhandledRejection', err => {
   });
 });
 
-io.on('connection', socket => {
-  console.log('New WebSocket Connection');
-
-  socket.on('join', userId => {
-    socket.join(userId);
-    console.log(`User ${userId} joined`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
-
-module.exports = { io };
+module.exports = server;

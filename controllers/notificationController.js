@@ -1,15 +1,22 @@
-const Notificaiton = require('./../models/notificaitonModel');
+/* eslint-disable no-console */
+const Notification = require('./../models/notificaitonModel');
 const User = require('./../models/userModel');
 const Project = require('./../models/projectModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factoryHandler = require('./../controllers/factoryHandler');
-const server = require('./../server');
-const Notification = require('./../models/notificaitonModel');
+const socket = require('../socket');
 
-const createNotification = catchAsync(
-  async (type, sender, receiver, task, project, message) => {
-    const notification = await Notificaiton.create({
+const createNotification = async (
+  type,
+  sender,
+  receiver,
+  task,
+  project,
+  message
+) => {
+  try {
+    const notification = await Notification.create({
       type,
       sender,
       receiver,
@@ -19,13 +26,17 @@ const createNotification = catchAsync(
       status: 'pending'
     });
 
-    server.io.to(receiver.toString()).emit('notification', notification);
+    const io = socket.getIO();
+    io.to(receiver.toString()).emit('notification', notification);
 
     return notification;
+  } catch (error) {
+    console.error('Error creating notification:', error);
+    throw error;
   }
-);
+};
 
-exports.findAllnotification = factoryHandler.findAll(Notification);
+exports.findAllNotification = factoryHandler.findAll(Notification);
 
 exports.inviteUserToProject = catchAsync(async (req, res, next) => {
   const { userId, projectId } = req.body;
@@ -41,7 +52,8 @@ exports.inviteUserToProject = catchAsync(async (req, res, next) => {
     return next(new AppError('Project not found', 404));
   }
 
-  const message = `You have been invited to join a Project: ${project.name}`;
+  const message = `You have been invited to join the project: ${project.name} by ${req.user.name}`;
+
   await createNotification(
     'projectInvitation',
     senderId,

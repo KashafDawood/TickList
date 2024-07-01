@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 
-const notificaitonSchema = new mongoose.Schema({
+const notificationSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ['projectInvitation', 'taskAssignment', 'chat', 'mention'],
     required: true
   },
   sender: {
@@ -16,34 +15,28 @@ const notificaitonSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  project: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Project',
-    required: true
-  },
   task: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Task',
-    required: true
+    ref: 'Task'
+  },
+  project: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Project'
   },
   message: {
-    type: String,
-    required: true
+    type: String
   },
   status: {
     type: String,
-    enum: ['unread', 'read', 'pending', 'accepted', 'rejected'],
+    enum: ['pending', 'accepted', 'declined'],
     default: 'pending'
   },
   createdAt: {
     type: Date,
     default: Date.now
-  },
-  readAt: {
-    type: Date
   }
 });
 
-const Notification = mongoose.model('Notificaiton', notificaitonSchema);
+const Notification = mongoose.model('Notification', notificationSchema);
 
 module.exports = Notification;

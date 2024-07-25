@@ -1,7 +1,3 @@
-Sure! Here's a detailed documentation for your Project Management System:
-
----
-
 # Project Management System Documentation
 
 ## Table of Contents

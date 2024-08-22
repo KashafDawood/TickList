@@ -5,6 +5,10 @@ const authController = require('./../controllers/authController');
 const router = express.Router();
 
 router
+  .route('/projectTask')
+  .post(authController.protect, taskController.projectTask);
+
+router
   .route('/')
   .post(authController.protect, taskController.createTask)
   .get(taskController.getAllTasks);

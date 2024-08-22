@@ -5,8 +5,6 @@ const User = require('./../models/userModel');
 
 exports.createOne = Model =>
   catchAsync(async (req, res, next) => {
-    const { body } = req;
-
     if (Model.modelName === 'Project') {
       const userId = req.user.id;
 
@@ -32,7 +30,14 @@ exports.createOne = Model =>
         }
       });
     } else {
-      const doc = await Model.create(body);
+      const userId = req.user.id;
+
+      const reqData = {
+        user: userId,
+        ...req.body
+      };
+
+      const doc = await Model.create(reqData);
 
       res.status(201).json({
         status: 'success',

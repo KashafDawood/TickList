@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -19,6 +20,12 @@ const app = express();
 
 // set security http methods
 app.use(helmet());
+
+app.use(
+  cors({
+    origin: 'http://localhost:3000'
+  })
+);
 
 // limit request form same ip
 const limit = rateLimit({

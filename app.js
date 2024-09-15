@@ -1,20 +1,21 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const express = require('express');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const hpp = require('hpp');
-const cors = require('cors');
+const express = require("express");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+const hpp = require("hpp");
+const cors = require("cors");
+const cookieparser = require("cookie-parser");
 
-const globalErrorHandler = require('./controllers/errorController');
-const AppError = require('./utils/appError');
+const globalErrorHandler = require("./controllers/errorController");
+const AppError = require("./utils/appError");
 
-const taskRouter = require('./routes/taskroute');
-const userRouter = require('./routes/userRoute');
-const projectRouter = require('./routes/projectRoute');
-const notificaitonRouter = require('./routes/notificationRoute');
+const taskRouter = require("./routes/taskroute");
+const userRouter = require("./routes/userRoute");
+const projectRouter = require("./routes/projectRoute");
+const notificaitonRouter = require("./routes/notificationRoute");
 
 const app = express();
 
@@ -23,7 +24,8 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: 'http://localhost:3000'
+    origin: "http://localhost:3000",
+    credentials: true,
   })
 );
 
@@ -31,16 +33,17 @@ app.use(
 const limit = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Too many requests from the same ip! Try again after an hour'
+  message: "Too many requests from the same ip! Try again after an hour",
 });
-app.use('/api', limit);
+app.use("/api", limit);
 
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
 }
 
 // body parser
 app.use(express.json());
+app.use(cookieparser());
 
 // data sanitize for no sql injections
 app.use(mongoSanitize());
@@ -58,12 +61,12 @@ app.use((req, res, next) => {
 });
 
 // ROUTES
-app.use('/api/v1/tasks', taskRouter);
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/projects', projectRouter);
-app.use('/api/v1/notifications', notificaitonRouter);
+app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/projects", projectRouter);
+app.use("/api/v1/notifications", notificaitonRouter);
 
-app.all('*', (req, res, next) => {
+app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 

@@ -1,19 +1,19 @@
-const express = require('express');
+const express = require("express");
 
-const authController = require('./../controllers/authController');
-const projectController = require('./../controllers/projectController');
+const authController = require("./../controllers/authController");
+const projectController = require("./../controllers/projectController");
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(authController.protect, projectController.createProject)
-  .get(authController.protect, projectController.getAllProject);
+router.use(authController.protect);
 
 router
-  .route('/userProjects')
-  .get(authController.protect, projectController.getUserProjects);
+  .route("/")
+  .post(projectController.createProject)
+  .get(projectController.getAllProject);
 
-router.route('/:id').get(authController.protect, projectController.getProject);
+router.route("/userProjects").get(projectController.getUserProjects);
+
+router.route("/:id").get(projectController.getProject);
 
 module.exports = router;

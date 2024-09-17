@@ -1,20 +1,20 @@
-const express = require('express');
+const express = require("express");
 
-const authController = require('./../controllers/authController');
-const notificationController = require('./../controllers/notificationController');
+const authController = require("./../controllers/authController");
+const notificationController = require("./../controllers/notificationController");
 
 const router = express.Router();
 
-router
-  .route('/')
-  .get(authController.protect, notificationController.findAllNotification);
+router.use(authController.protect);
+
+router.route("/").get(notificationController.findAllNotification);
 
 router
-  .route('/inviteUserToProject')
-  .post(authController.protect, notificationController.inviteUserToProject);
+  .route("/inviteUserToProject")
+  .post(notificationController.inviteUserToProject);
 
 router
-  .route('/invitationResponse')
-  .post(authController.protect, notificationController.invitationResponse);
+  .route("/invitationResponse")
+  .post(notificationController.invitationResponse);
 
 module.exports = router;

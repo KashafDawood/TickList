@@ -1,11 +1,11 @@
-const AppError = require('../utils/appError');
-const catchAsync = require('../utils/catchAsync');
-const User = require('./../models/userModel');
-const factoryHandler = require('./factoryHandler');
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
+const User = require("./../models/userModel");
+const factoryHandler = require("./factoryHandler");
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
-  Object.keys(obj).forEach(el => {
+  Object.keys(obj).forEach((el) => {
     if (allowedFields.includes(el)) {
       newObj[el] = obj[el];
     }
@@ -18,24 +18,24 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
-        'This route is not for password update, Please use /updateMyPassword!',
+        "This route is not for password update, Please use /updateMyPassword!",
         400
       )
     );
   }
 
   // Update user document
-  const filteredBody = filterObj(req.body, 'name', 'email');
+  const filteredBody = filterObj(req.body, "name", "email");
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
-    runValidators: true
+    runValidators: true,
   });
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: {
-      updatedUser
-    }
+      updatedUser,
+    },
   });
 });
 
@@ -43,22 +43,23 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
 
   res.status(204).json({
-    status: 'success',
-    data: null
+    status: "success",
+    data: null,
   });
 });
 
 exports.getUserProjects = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).populate({
-    path: 'projects.project',
-    select: '_id name role'
+    path: "projects.project",
+    select: "_id name role",
   });
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     result: user.projects.length,
-    data: user.projects
+    data: user.projects,
   });
 });
 
 exports.getAllUsers = factoryHandler.findAll(User);
+exports.getUser = factoryHandler.findOne(User);

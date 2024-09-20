@@ -31,7 +31,7 @@ app.use(
 
 // limit request form same ip
 const limit = rateLimit({
-  max: 100,
+  max: 500,
   windowMs: 60 * 60 * 1000,
   message: "Too many requests from the same ip! Try again after an hour",
 });

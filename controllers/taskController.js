@@ -39,30 +39,41 @@ exports.projectTask = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUserTasks = catchAsync(async (req, res, next) => {
-  const userId = req.user.id;
+// exports.getUserTasks = catchAsync(async (req, res, next) => {
+//   const userId = req.user.id;
 
-  const tasks = await Task.find({
-    user: userId,
-  })
-    .populate({
-      path: "user",
-      select: "name email",
-    })
-    .populate({
-      path: "project",
-      select: "name description",
-    });
+//   const tasks = await Task.find({
+//     user: userId,
+//   })
+//     .populate({
+//       path: "user",
+//       select: "name email",
+//     })
+//     .populate({
+//       path: "project",
+//       select: "name description",
+//     });
 
-  if (tasks.length === 0) {
-    return next(new AppError("No tasks found for this user", 404));
-  }
+//   if (tasks.length === 0) {
+//     return next(new AppError("No tasks found for this user", 404));
+//   }
 
-  res.status(200).json({
-    status: "success",
-    results: tasks.length,
-    data: {
-      tasks,
-    },
-  });
-});
+//   res.status(200).json({
+//     status: "success",
+//     results: tasks.length,
+//     data: {
+//       tasks,
+//     },
+//   });
+// });
+
+exports.getUserTasks = factoryHandler.findUserData(Task, [
+  {
+    path: "user",
+    select: "name email",
+  },
+  {
+    path: "project",
+    select: "name description",
+  },
+]);
